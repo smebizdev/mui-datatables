@@ -223,6 +223,7 @@ class MUIDataTable extends React.Component {
         filename: 'tableDownload.csv',
         separator: ',',
       },
+      toolbar: true,
     };
 
     this.options = merge(defaultOptions, props.options);
@@ -963,10 +964,37 @@ class MUIDataTable extends React.Component {
     };
   }
 
-  // must be arrow function on local field to refer to the correct instance when passed around
-  // assigning it as arrow function in the JSX would cause hard to track re-render errors
-  getTableContentRef = () => {
-    return this.tableContent.current;
+  renderToolbar = () => {
+    const { title } = this.props;
+    const { data, displayData, columns, filterData, filterList, selectedRows, searchColumn } = this.state;
+
+    return selectedRows.data.length ? (
+      <MUIDataTableToolbarSelect
+        options={this.options}
+        selectedRows={selectedRows}
+        onRowsDelete={this.selectRowDelete}
+        displayData={displayData}
+        selectRowUpdate={this.selectRowUpdate}
+      />
+    ) : (
+      <MUIDataTableToolbar
+        columns={columns}
+        displayData={displayData}
+        data={data}
+        filterData={filterData}
+        filterList={filterList}
+        filterUpdate={this.filterUpdate}
+        options={this.options}
+        resetFilters={this.resetFilters}
+        searchTextUpdate={this.searchTextUpdate}
+        tableRef={() => this.tableContent}
+        title={title}
+        toggleViewColumn={this.toggleViewColumn}
+        setTableAction={this.setTableAction}
+        searchColumnChange={this.searchColumnChange}
+        searchColumn={searchColumn}
+      />
+    );
   };
 
   render() {
@@ -993,31 +1021,32 @@ class MUIDataTable extends React.Component {
         elevation={this.options.elevation}
         ref={this.tableContent}
         className={classnames(classes.paper, className)}>
-        {selectedRows.data.length ? (
-          <TableToolbarSelect
-            options={this.options}
-            selectedRows={selectedRows}
-            onRowsDelete={this.selectRowDelete}
-            displayData={displayData}
-            selectRowUpdate={this.selectRowUpdate}
-          />
-        ) : (
-          <TableToolbar
-            columns={columns}
-            displayData={displayData}
-            data={data}
-            filterData={filterData}
-            filterList={filterList}
-            filterUpdate={this.filterUpdate}
-            options={this.options}
-            resetFilters={this.resetFilters}
-            searchTextUpdate={this.searchTextUpdate}
-            tableRef={this.getTableContentRef}
-            title={title}
-            toggleViewColumn={this.toggleViewColumn}
-            setTableAction={this.setTableAction}
-          />
-        )}
+        {this.options.toolbar &&
+          (selectedRows.data.length ? (
+            <TableToolbarSelect
+              options={this.options}
+              selectedRows={selectedRows}
+              onRowsDelete={this.selectRowDelete}
+              displayData={displayData}
+              selectRowUpdate={this.selectRowUpdate}
+            />
+          ) : (
+            <TableToolbar
+              columns={columns}
+              displayData={displayData}
+              data={data}
+              filterData={filterData}
+              filterList={filterList}
+              filterUpdate={this.filterUpdate}
+              options={this.options}
+              resetFilters={this.resetFilters}
+              searchTextUpdate={this.searchTextUpdate}
+              tableRef={this.getTableContentRef}
+              title={title}
+              toggleViewColumn={this.toggleViewColumn}
+              setTableAction={this.setTableAction}
+            />
+          ))}
         <TableFilterList options={this.options} filterList={filterList} filterUpdate={this.filterUpdate} />
         <div
           style={{ position: 'relative' }}
