@@ -114,59 +114,65 @@ class TableBody extends React.Component {
 
   render() {
     const { classes, columns, toggleExpandRow, options } = this.props;
+    const { rowRenderer } = options;
+
     const tableRows = this.buildRows();
     const visibleColCnt = columns.filter(c => c.display === 'true').length;
 
     return (
       <MuiTableBody>
         {tableRows && tableRows.length > 0 ? (
-          tableRows.map(({ data: row, dataIndex }, rowIndex) => (
-            <React.Fragment key={rowIndex}>
-              <TableBodyRow
-                {...(options.setRowProps ? options.setRowProps(row, dataIndex) : {})}
-                options={options}
-                rowSelected={options.selectableRows ? this.isRowSelected(dataIndex) : false}
-                onClick={this.handleRowClick.bind(null, row, { rowIndex, dataIndex })}
-                id={'MUIDataTableBodyRow-' + dataIndex}>
-                <TableSelectCell
-                  onChange={this.handleRowSelect.bind(null, {
-                    index: this.getRowIndex(rowIndex),
-                    dataIndex: dataIndex,
-                  })}
-                  onExpand={toggleExpandRow.bind(null, {
-                    index: this.getRowIndex(rowIndex),
-                    dataIndex: dataIndex,
-                  })}
-                  fixedHeader={options.fixedHeader}
-                  checked={this.isRowSelected(dataIndex)}
-                  expandableOn={options.expandableRows}
-                  selectableOn={options.selectableRows}
-                  isRowExpanded={this.isRowExpanded(dataIndex)}
-                  isRowSelectable={this.isRowSelectable(dataIndex)}
-                  id={'MUIDataTableSelectCell-' + dataIndex}
-                />
-                {row.map(
-                  (column, columnIndex) =>
-                    columns[columnIndex].display === 'true' && (
-                      <TableBodyCell
-                        {...(columns[columnIndex].setCellProps
-                          ? columns[columnIndex].setCellProps(column, dataIndex, columnIndex)
-                          : {})}
-                        dataIndex={dataIndex}
-                        rowIndex={rowIndex}
-                        colIndex={columnIndex}
-                        columnHeader={columns[columnIndex].label}
-                        print={columns[columnIndex].print}
-                        options={options}
-                        key={columnIndex}>
-                        {column}
-                      </TableBodyCell>
-                    ),
-                )}
-              </TableBodyRow>
-              {this.isRowExpanded(dataIndex) && options.renderExpandableRow(row, { rowIndex, dataIndex })}
-            </React.Fragment>
-          ))
+          tableRows.map(({ data: row, dataIndex }, rowIndex) =>
+            rowRenderer ? (
+              rowRenderer({ RowComponent: TableBodyRow, row })
+            ) : (
+              <React.Fragment key={rowIndex}>
+                <TableBodyRow
+                  {...(options.setRowProps ? options.setRowProps(row, dataIndex) : {})}
+                  options={options}
+                  rowSelected={options.selectableRows ? this.isRowSelected(dataIndex) : false}
+                  onClick={this.handleRowClick.bind(null, row, { rowIndex, dataIndex })}
+                  id={'MUIDataTableBodyRow-' + dataIndex}>
+                  <TableSelectCell
+                    onChange={this.handleRowSelect.bind(null, {
+                      index: this.getRowIndex(rowIndex),
+                      dataIndex: dataIndex,
+                    })}
+                    onExpand={toggleExpandRow.bind(null, {
+                      index: this.getRowIndex(rowIndex),
+                      dataIndex: dataIndex,
+                    })}
+                    fixedHeader={options.fixedHeader}
+                    checked={this.isRowSelected(dataIndex)}
+                    expandableOn={options.expandableRows}
+                    selectableOn={options.selectableRows}
+                    isRowExpanded={this.isRowExpanded(dataIndex)}
+                    isRowSelectable={this.isRowSelectable(dataIndex)}
+                    id={'MUIDataTableSelectCell-' + dataIndex}
+                  />
+                  {row.map(
+                    (column, columnIndex) =>
+                      columns[columnIndex].display === 'true' && (
+                        <TableBodyCell
+                          {...(columns[columnIndex].setCellProps
+                            ? columns[columnIndex].setCellProps(column, dataIndex, columnIndex)
+                            : {})}
+                          dataIndex={dataIndex}
+                          rowIndex={rowIndex}
+                          colIndex={columnIndex}
+                          columnHeader={columns[columnIndex].label}
+                          print={columns[columnIndex].print}
+                          options={options}
+                          key={columnIndex}>
+                          {column}
+                        </TableBodyCell>
+                      ),
+                  )}
+                </TableBodyRow>
+                {this.isRowExpanded(dataIndex) && options.renderExpandableRow(row, { rowIndex, dataIndex })}
+              </React.Fragment>
+            ),
+          )
         ) : (
           <TableBodyRow options={options}>
             <TableBodyCell

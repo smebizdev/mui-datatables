@@ -1009,9 +1009,11 @@ class MUIDataTable extends React.Component {
       filterData,
       filterList,
       selectedRows,
-      expandedRows,
+      expandedRows: expandedRowsFromState,
       searchText,
     } = this.state;
+
+    const expandedRows = this.props.options.expandedRows || expandedRowsFromState;
 
     const rowCount = this.options.count || displayData.length;
     const rowsPerPage = this.options.pagination ? this.state.rowsPerPage : displayData.length;
